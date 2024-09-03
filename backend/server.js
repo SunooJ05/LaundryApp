@@ -1,7 +1,9 @@
-require('dotenv').config();
-const express = require('express');
-const mongoose = require('mongoose');
-const cors = require('cors');
+import 'dotenv/config';
+import express from 'express';
+import mongoose from 'mongoose';
+import cors from 'cors';
+import routes from './api/routes.js'; // Importing routes
+
 const app = express();
 const PORT = process.env.PORT || 5000;
 
@@ -25,6 +27,9 @@ mongoose.connection.on('connected', () => {
 mongoose.connection.on('error', (err) => {
   console.log('Error connecting to MongoDB:', err);
 });
+
+// Use routes
+app.use(routes);
 
 // Basic route
 app.get('/', (req, res) => {
