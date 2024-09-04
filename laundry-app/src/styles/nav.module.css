@@ -1,0 +1,35 @@
+.navbar {
+    font-family: "Verdana";
+    padding-left: 20px;
+    padding-right: 40px;
+    display: flex;
+    white-space: nowrap;
+    align-items: center;
+    margin-top: 0px;
+    border-bottom: 10px solid #464646;
+    background-color: rgb(95, 95, 95);
+    font-size:xx-large;
+}
+
+.navbar h1 {
+    padding-left: 20px;
+    color:black;
+}
+.navbar a {
+    background-color: rgb(119, 119, 119);
+    margin-left: 46px;
+    text-decoration: none;
+    border-radius: 8px;
+    padding:10px;
+    color: black;
+    font-size: x-large;
+    font-weight: bold;
+}
+.links {
+    margin-left: auto;
+    flex-wrap: nowrap;
+}
+.navbar a:hover {
+    background-color: rgb(44, 44, 44);
+    color: #FFF1DE;
+}

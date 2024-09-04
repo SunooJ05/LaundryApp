@@ -1,5 +1,6 @@
 import React from 'react';
 import Layout from '../layout/Layout';
+import styles from '../styles/main.module.css';
 
 const AccountSetup = () => {
     return (
