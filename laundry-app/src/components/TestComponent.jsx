@@ -19,12 +19,6 @@ function TestComponent() {
     <div>
       <h1>Test API Data</h1>
       {data ? <pre>{JSON.stringify(data, null, 2)}</pre> : <p>Loading...</p>}
-      <div>
-        <a href="/">Home</a>
-        <a href="/adminview">Admin View</a>
-        <a href="accountsetup">Account Setup</a>
-        <a href="/userview">User View</a>
-      </div>
     </div>
   );
 }

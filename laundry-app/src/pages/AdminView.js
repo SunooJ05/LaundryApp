@@ -1,9 +1,12 @@
 import React from 'react';
+import Layout from '../layout/Layout.js'
 
-const AdminView = () => (
-  <h1>
-    <p>"This is Admin View page"</p>
-  </h1>
-);
+const AdminView = () => {
+    return (
+    <Layout>
+        <h1> <p>This is Admin View page</p> </h1>
+    </Layout>
+    )
+};
 
 export default AdminView;
