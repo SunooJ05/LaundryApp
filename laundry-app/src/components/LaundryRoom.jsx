@@ -1,40 +1,37 @@
+// components/LaundryRoom.js
 import React from 'react';
 import { useDrop } from 'react-dnd';
-import Machine from './Machine';
+import Machine from './Machine'; // Import Machine component
+import styles from '../styles/main.module.css';
 
 const LaundryRoom = ({ machines, moveMachine }) => {
-  const [, dropRef] = useDrop({
-    accept: 'MACHINE',
-    drop: (item, monitor) => {
-      const delta = monitor.getDifferenceFromInitialOffset();
-      moveMachine(item.id, delta);
-    },
-  });
+    const [{ isOver }, drop] = useDrop(() => ({
+        accept: 'machine',
+        drop: (item, monitor) => {
+            const delta = monitor.getDifferenceFromInitialOffset();
+            const newX = Math.round(item.x + delta.x);
+            const newY = Math.round(item.y + delta.y);
+            moveMachine(item.id, newX, newY);
+        },
+        collect: (monitor) => ({
+            isOver: monitor.isOver(),
+        }),
+    }));
 
-  return (
-    <div
-      ref={dropRef}
-      style={{
-        width: '500px',
-        height: '500px',
-        border: '1px solid black',
-        position: 'relative',
-      }}
-    >
-      {machines.map((machine) => (
-        <div
-          key={machine.machineID}
-          style={{
-            position: 'absolute',
-            left: `${machine.locationX}px`,
-            top: `${machine.locationY}px`,
-          }}
-        >
-          <Machine machine={machine} />
+    return (
+        <div ref={drop} className={styles.laundryRoom}>
+            {machines.map((machine) => (
+                <Machine
+                    key={machine.machineID}
+                    id={machine.machineID}
+                    type={machine.type}
+                    x={machine.locationX}
+                    y={machine.locationY}
+                    moveMachine={moveMachine}
+                />
+            ))}
         </div>
-      ))}
-    </div>
-  );
+    );
 };
 
 export default LaundryRoom;

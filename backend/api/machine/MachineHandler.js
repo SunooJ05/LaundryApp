@@ -33,6 +33,8 @@ export const updateMachinePosition = async (req, res) => {
     }
 };
 
+
+
 // Delete a machine
 // ADMIN AUTH TODO
 export const deleteMachine = async (req, res) => {
