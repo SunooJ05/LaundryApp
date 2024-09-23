@@ -5,11 +5,11 @@ const machineSchema = new mongoose.Schema({
     machineID: { type: Number, unique: true },
     type: { type: String, enum: ['washer', 'dryer'], required: true },
     status: { type: String, enum: ['available', 'in-use', 'out-of-order'], required: true, default: 'available' },
-    locationX: { type: Number, require: true, default: 0},
-    locationY: { type: Number, require: true, default: 0},
+    locationX: { type: Number, required: true, default: 0},
+    locationY: { type: Number, required: true, default: 0},
     expectedEndTime: { type: Date, default: null }, // The time when the machine is expected to finish
     userID: { type: mongoose.Schema.Types.ObjectId, ref: 'User', default: null },
-    room: {type: String, require: true},
+    room: {type: String, required: true},
 });
 
 machineSchema.virtual('remainingTime').get(function () {

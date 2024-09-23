@@ -1,5 +1,5 @@
 import express from 'express'
-import { createMachine, updateMachinePosition, deleteMachine, getAllMachines, getMachineById, updateMachine } from './MachineHandler.js'
+import { createMachine, updateMachinePosition, deleteMachine, getAllMachines, getMachineById, updateMachine, getMachinesByRoom } from './MachineHandler.js'
 
 const router = express.Router()
 
@@ -20,6 +20,9 @@ router.get('/getOne/:machineID', getMachineById);
 
 //Update Machine
 router.put('/updateMachine/:machineID', updateMachine);
+
+// Get machines by room
+router.get('/getByRoom/:roomName', getMachinesByRoom);
 
 export default router;
 

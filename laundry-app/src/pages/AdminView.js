@@ -9,7 +9,14 @@ const AdminView = () => {
     const [rooms, setRooms] = useState([]); // Holds available rooms
     const [selectedRoom, setSelectedRoom] = useState(''); // Holds the current room selection
     const [machines, setMachines] = useState([]);
-    const [newRoomName, setNewRoomName] = useState(''); // Holds the new room name input
+    const [newRoomName, setNewRoomName] = useState(''); 
+    const [newMachine, setNewMachine] = useState({
+        type: 'washer',
+        locationX: 0,
+        locationY: 0,
+        room: '', // will be filled when a room is selected
+    });
+    const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
 
 
     // Fetch the available rooms when the component mounts
@@ -30,12 +37,13 @@ const AdminView = () => {
         if (selectedRoom) {
             const fetchMachines = async () => {
                 try {
-                    const response = await axios.get(`/api/machine/getByRoom/${selectedRoom}`);
+                    const response = await axios.get(`/api/machine/getByRoom/${encodeURIComponent(selectedRoom)}`);
                     setMachines(response.data);
                 } catch (error) {
                     console.error('Error fetching machines:', error);
                 }
             };
+            
             fetchMachines();
         }
     }, [selectedRoom]);
@@ -58,6 +66,43 @@ const AdminView = () => {
         }
     };
 
+    //machine creation
+    const handleCreateMachine = async (e) => {
+        e.preventDefault();
+        try {
+            const response = await axios.post('/api/machine/create', {
+                ...newMachine,
+                room: selectedRoom, // Ensure the room is set to the selected room
+            });
+            setMachines((prevMachines) => [...prevMachines, response.data]);
+            setNewMachine({ type: 'washer', locationX: 0, locationY: 0, room: selectedRoom }); // Reset the form
+        } catch (error) {
+            console.error('Error creating machine:', error);
+        }
+    };
+    
+    // Handle machine deletion with confirmation
+    const handleDeleteMachine = async (machineID) => {
+        const confirmDelete = window.confirm('Are you sure you want to delete this machine?');
+        if (!confirmDelete) return;
+
+        try {
+            await axios.delete(`/api/machine/delete/${machineID}`);
+            setMachines((prevMachines) => prevMachines.filter(machine => machine.machineID !== machineID));
+        } catch (error) {
+            console.error('Error deleting machine:', error);
+        }
+    };
+
+    // Track mouse position over the layout
+    const handleMouseMove = (e) => {
+        const layout = e.target.getBoundingClientRect();
+        setMousePosition({
+            x: Math.floor(e.clientX - layout.left),
+            y: Math.floor(e.clientY - layout.top),
+        });
+    };
+
     return (
         <Layout>
             <DndProvider backend={HTML5Backend}>
@@ -69,7 +114,6 @@ const AdminView = () => {
                     <select value={selectedRoom} onChange={handleRoomChange}>
                         <option value="">-- Select a Room --</option>
                         {rooms.map((room, index) => (
-                            // Map room.roomName because each room object contains roomName field
                             <option key={index} value={room.roomName}>
                                 {room.roomName}
                             </option>
@@ -77,8 +121,8 @@ const AdminView = () => {
                     </select>
                 </label>
 
-                 {/* Form to create a new laundry room */}
-                 <form onSubmit={handleCreateRoom}>
+                {/* Form to create a new laundry room */}
+                <form onSubmit={handleCreateRoom}>
                     <label>
                         Create New Room:
                         <input
@@ -92,13 +136,60 @@ const AdminView = () => {
                     <button type="submit">Add Room</button>
                 </form>
 
-                {/* Display laundry room layout if a room is selected */}
+                {/* Form to create a new machine */}
+                <form onSubmit={handleCreateMachine}>
+                    <h2>Create New Machine</h2>
+                    <label>
+                        Type:
+                        <select
+                            value={newMachine.type}
+                            onChange={(e) => setNewMachine({ ...newMachine, type: e.target.value })}
+                        >
+                            <option value="washer">Washer</option>
+                            <option value="dryer">Dryer</option>
+                        </select>
+                    </label>
+                    <label>
+                        Initial X Position:
+                        <input
+                            type="number"
+                            value={newMachine.locationX}
+                            onChange={(e) => setNewMachine({ ...newMachine, locationX: parseInt(e.target.value) })}
+                            required
+                        />
+                    </label>
+                    <label>
+                        Initial Y Position:
+                        <input
+                            type="number"
+                            value={newMachine.locationY}
+                            onChange={(e) => setNewMachine({ ...newMachine, locationY: parseInt(e.target.value) })}
+                            required
+                        />
+                    </label>
+                    <button type="submit">Add Machine</button>
+                </form>
+
+                {/* Display laundry room layout and machine deletion */}
                 {selectedRoom && (
                     <>
                         <p>Managing machines in: {selectedRoom}</p>
-                        <LaundryRoom machines={machines} moveMachine={() => {}} />
+                        <LaundryRoom machines={machines} moveMachine={() => {}} onMouseMove={handleMouseMove} />
+                        <ul>
+                            {machines.map(machine => (
+                                <li key={machine.machineID}>
+                                    {machine.type} - {machine.machineID}
+                                    <button onClick={() => handleDeleteMachine(machine.machineID)}>Delete</button>
+                                </li>
+                            ))}
+                        </ul>
                     </>
                 )}
+
+                {/* Display mouse position over the layout */}
+                <div>
+                    <p>Mouse Position: X: {mousePosition.x}, Y: {mousePosition.y}</p>
+                </div>
             </DndProvider>
         </Layout>
     );
