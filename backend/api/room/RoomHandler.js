@@ -1,10 +1,9 @@
 // RoomHandler.js
-import LaundryRoom from '../../models/LaundryRoom.js'; // Import the LaundryRoom model
-
+import LaundryRoom from '../../models/LaundryRoom.js'; 
 // Fetch all available rooms
 export const getRooms = async (req, res) => {
     try {
-        const rooms = await LaundryRoom.find().select('roomName'); // Fetch room names only
+        const rooms = await LaundryRoom.find().select('roomName'); // Fetches room names only
         res.json(rooms);
     } catch (error) {
         res.status(500).json({ message: 'Error fetching rooms', error });

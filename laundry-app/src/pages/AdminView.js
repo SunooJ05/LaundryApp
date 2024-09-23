@@ -9,12 +9,14 @@ const AdminView = () => {
     const [rooms, setRooms] = useState([]); // Holds available rooms
     const [selectedRoom, setSelectedRoom] = useState(''); // Holds the current room selection
     const [machines, setMachines] = useState([]);
+    const [newRoomName, setNewRoomName] = useState(''); // Holds the new room name input
+
 
     // Fetch the available rooms when the component mounts
     useEffect(() => {
         const fetchRooms = async () => {
             try {
-                const response = await axios.get('/api/machine/rooms');
+                const response = await axios.get('/api/room/getRooms');
                 setRooms(response.data);
             } catch (error) {
                 console.error('Error fetching rooms:', error);
@@ -43,6 +45,19 @@ const AdminView = () => {
         setSelectedRoom(e.target.value);
     };
 
+    // Handle new room creation
+    const handleCreateRoom = async (e) => {
+        e.preventDefault();
+
+        try {
+            const response = await axios.post('/api/room/addRoom', { roomName: newRoomName });
+            setRooms((prevRooms) => [...prevRooms, response.data]); // Add new room to the room list
+            setNewRoomName(''); // Clear the input after creation
+        } catch (error) {
+            console.error('Error creating room:', error);
+        }
+    };
+
     return (
         <Layout>
             <DndProvider backend={HTML5Backend}>
@@ -54,12 +69,28 @@ const AdminView = () => {
                     <select value={selectedRoom} onChange={handleRoomChange}>
                         <option value="">-- Select a Room --</option>
                         {rooms.map((room, index) => (
-                            <option key={index} value={room}>
-                                {room}
+                            // Map room.roomName because each room object contains roomName field
+                            <option key={index} value={room.roomName}>
+                                {room.roomName}
                             </option>
                         ))}
                     </select>
                 </label>
+
+                 {/* Form to create a new laundry room */}
+                 <form onSubmit={handleCreateRoom}>
+                    <label>
+                        Create New Room:
+                        <input
+                            type="text"
+                            value={newRoomName}
+                            onChange={(e) => setNewRoomName(e.target.value)}
+                            placeholder="Enter room name"
+                            required
+                        />
+                    </label>
+                    <button type="submit">Add Room</button>
+                </form>
 
                 {/* Display laundry room layout if a room is selected */}
                 {selectedRoom && (

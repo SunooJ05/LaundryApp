@@ -1,5 +1,4 @@
 import mongoose from 'mongoose';
-const mongoose = require('mongoose');
 
 const laundryRoomSchema = new mongoose.Schema({
   roomName: { type: String, required: true, unique: true },

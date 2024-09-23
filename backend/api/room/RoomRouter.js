@@ -1,12 +1,16 @@
 // RoomRouter.js
 import express from 'express';
-import { getRooms } from './RoomHandler.js'; // Import the room handler
+import { getRooms, addRoom, deleteRoom } from './RoomHandler.js'; 
 
 const router = express.Router();
 
-// Route to get the list of available rooms
-router.get('/rooms', getRooms);
+// Route to get all available rooms
+router.get('/getRooms', getRooms);
 
+// Route to add a new room
+router.post('/addRoom', addRoom);
 
+// Route to delete a room
+router.delete('/deleteRoom/:roomName', deleteRoom);
 
 export default router;
