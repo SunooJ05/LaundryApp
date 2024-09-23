@@ -1,47 +1,73 @@
-// components/AdminView.js
 import React, { useState, useEffect } from 'react';
 import Layout from '../layout/Layout';
 import LaundryRoom from '../components/LaundryRoom';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
-import axios from '../api/axios';
+import axios from '../api/axios'; 
 
 const AdminView = () => {
+    const [rooms, setRooms] = useState([]); // Holds available rooms
+    const [selectedRoom, setSelectedRoom] = useState(''); // Holds the current room selection
     const [machines, setMachines] = useState([]);
 
+    // Fetch the available rooms when the component mounts
     useEffect(() => {
-        // Fetch all machines for a specific room (you can make this dynamic by passing room as a prop)
-        const fetchMachines = async () => {
-            const response = await axios.get('/api/machine/getAll');
-            setMachines(response.data);
+        const fetchRooms = async () => {
+            try {
+                const response = await axios.get('/api/machine/rooms');
+                setRooms(response.data);
+            } catch (error) {
+                console.error('Error fetching rooms:', error);
+            }
         };
-        fetchMachines();
+        fetchRooms();
     }, []);
 
-    const moveMachine = async (id, x, y) => {
-        // Update machine position locally
-        setMachines((prevMachines) =>
-            prevMachines.map((machine) =>
-                machine.machineID === id
-                    ? { ...machine, locationX: x, locationY: y }
-                    : machine
-            )
-        );
-
-        // Save updated position to the backend
-        try {
-            await axios.put(`/api/machine/updatePosition/${id}`, { locationX: x, locationY: y });
-        } catch (error) {
-            console.error('Error updating machine position:', error);
+    // Fetch machines for the selected room
+    useEffect(() => {
+        if (selectedRoom) {
+            const fetchMachines = async () => {
+                try {
+                    const response = await axios.get(`/api/machine/getByRoom/${selectedRoom}`);
+                    setMachines(response.data);
+                } catch (error) {
+                    console.error('Error fetching machines:', error);
+                }
+            };
+            fetchMachines();
         }
+    }, [selectedRoom]);
+
+    // Handle room selection
+    const handleRoomChange = (e) => {
+        setSelectedRoom(e.target.value);
     };
 
     return (
         <Layout>
             <DndProvider backend={HTML5Backend}>
                 <h1>Admin View - Laundry Room Layout</h1>
-                <p>Drag and drop the machines to arrange them in the room.</p>
-                <LaundryRoom machines={machines} moveMachine={moveMachine} />
+
+                {/* Room selector dropdown */}
+                <label>
+                    Select Room:
+                    <select value={selectedRoom} onChange={handleRoomChange}>
+                        <option value="">-- Select a Room --</option>
+                        {rooms.map((room, index) => (
+                            <option key={index} value={room}>
+                                {room}
+                            </option>
+                        ))}
+                    </select>
+                </label>
+
+                {/* Display laundry room layout if a room is selected */}
+                {selectedRoom && (
+                    <>
+                        <p>Managing machines in: {selectedRoom}</p>
+                        <LaundryRoom machines={machines} moveMachine={() => {}} />
+                    </>
+                )}
             </DndProvider>
         </Layout>
     );
