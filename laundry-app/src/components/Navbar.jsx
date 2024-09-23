@@ -3,7 +3,7 @@ import styles from '../styles/nav.module.css';
 
 
 const Navbar = () => {
-  let isAdmin = false;
+  let isAdmin = true;
   return (
     <nav className={styles.navbar}>
       <h1>Ladro Padro</h1>

@@ -9,6 +9,7 @@ const machineSchema = new mongoose.Schema({
     locationY: { type: Number, require: true, default: 0},
     expectedEndTime: { type: Date, default: null }, // The time when the machine is expected to finish
     userID: { type: mongoose.Schema.Types.ObjectId, ref: 'User', default: null },
+    room: {type: String, require: true, unique: true},
 });
 
 machineSchema.virtual('remainingTime').get(function () {
