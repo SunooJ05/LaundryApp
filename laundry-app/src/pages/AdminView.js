@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import Layout from '../layout/Layout';
 import styles from '../styles/main.module.css';
-import { useDrag, useDrop } from 'react-dnd';
+import { useDrag, useDrop, DndProvider } from 'react-dnd';
+import { HTML5Backend } from 'react-dnd-html5-backend';
 import axios from 'axios';
 
 const Machine = ({ id, type, x, y, moveMachine }) => {
@@ -88,9 +89,11 @@ const AdminView = () => {
 
     return (
         <Layout>
-            <h1>Admin View - Laundry Room Layout</h1>
-            <p>Drag and drop the machines to arrange them in the room.</p>
-            <LaundryRoom machines={machines} moveMachine={moveMachine} />
+            <DndProvider backend={HTML5Backend}>
+                <h1>Admin View - Laundry Room Layout</h1>
+                <p>Drag and drop the machines to arrange them in the room.</p>
+                <LaundryRoom machines={machines} moveMachine={moveMachine} />
+            </DndProvider>
         </Layout>
     );
 };
