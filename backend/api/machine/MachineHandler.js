@@ -3,21 +3,65 @@ import Machine from '../../models/Machine.js';
 // Create a new machine
 // ADMIN AUTH TODO
 import LaundryRoom from '../../models/LaundryRoom.js'; 
+import autoIncrement from '../../util/autoIncrement.js'; // Adjust the path if needed
 
+
+// export const createMachine = async (req, res) => {
+//     try {
+//         const { type, status, locationX, locationY, room } = req.body;  
+//         if (!type || !room) {
+//             return res.status(400).json({ message: 'Type and room are required' });
+//         }
+
+//         // Create the machine
+//         const machine = new Machine({ type, status, locationX, locationY, room });
+//         await machine.save();
+
+//         // Add the machine to the laundry room's machines array
+//         const updatedRoom = await LaundryRoom.findOneAndUpdate(
+//             { roomName: room }, 
+//             { $push: { machines: machine._id } }, // Add the machine's ObjectId to the room's machines array
+//             { new: true }
+//         );
+
+//         if (!updatedRoom) {
+//             return res.status(404).json({ message: 'Room not found' });
+//         }
+
+//         res.status(201).json(machine);
+//     } catch (error) {
+//         res.status(500).json({ message: error.message });
+//     }
+// };
+
+//detailed logging
 export const createMachine = async (req, res) => {
     try {
-        const { type, status, locationX, locationY, room } = req.body;  
+        const { type, status, locationX, locationY, room } = req.body;
+        
         if (!type || !room) {
             return res.status(400).json({ message: 'Type and room are required' });
         }
 
-        // Create the machine
-        const machine = new Machine({ type, status, locationX, locationY, room });
+        let machineID;
+        try {
+            // Try to generate a unique machineID using the autoIncrement function
+            machineID = await autoIncrement('machineID');
+            console.log('Generated machineID:', machineID); // Log the generated machineID for debugging
+        } catch (incrementError) {
+            console.error('Error in autoIncrement:', incrementError);
+            return res.status(500).json({ message: 'Failed to generate unique machineID' });
+        }
+
+        // Create the machine with the generated machineID
+        const machine = new Machine({ machineID, type, status, locationX, locationY, room });
+
+        // Save the machine
         await machine.save();
 
         // Add the machine to the laundry room's machines array
         const updatedRoom = await LaundryRoom.findOneAndUpdate(
-            { roomName: room }, 
+            { roomName: room },
             { $push: { machines: machine._id } }, // Add the machine's ObjectId to the room's machines array
             { new: true }
         );
@@ -27,7 +71,9 @@ export const createMachine = async (req, res) => {
         }
 
         res.status(201).json(machine);
+
     } catch (error) {
+        console.error('Error creating machine:', error); // Log the general error
         res.status(500).json({ message: error.message });
     }
 };

@@ -6,20 +6,18 @@ import { HTML5Backend } from 'react-dnd-html5-backend';
 import axios from '../api/axios'; 
 
 const AdminView = () => {
-    const [rooms, setRooms] = useState([]); // Holds available rooms
-    const [selectedRoom, setSelectedRoom] = useState(''); // Holds the current room selection
+    const [rooms, setRooms] = useState([]);
+    const [selectedRoom, setSelectedRoom] = useState('');
     const [machines, setMachines] = useState([]);
-    const [newRoomName, setNewRoomName] = useState(''); 
+    const [newRoomName, setNewRoomName] = useState('');
     const [newMachine, setNewMachine] = useState({
         type: 'washer',
         locationX: 0,
         locationY: 0,
-        room: '', // will be filled when a room is selected
+        room: '',
     });
     const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
 
-
-    // Fetch the available rooms when the component mounts
     useEffect(() => {
         const fetchRooms = async () => {
             try {
@@ -32,7 +30,6 @@ const AdminView = () => {
         fetchRooms();
     }, []);
 
-    // Fetch machines for the selected room
     useEffect(() => {
         if (selectedRoom) {
             const fetchMachines = async () => {
@@ -43,58 +40,69 @@ const AdminView = () => {
                     console.error('Error fetching machines:', error);
                 }
             };
-            
             fetchMachines();
         }
     }, [selectedRoom]);
 
-    // Handle room selection
+    // Update machine position locally and on backend
+    const updateMachinePosition = async (id, x, y) => {
+        // Update the machine position in the local state
+        setMachines((prevMachines) =>
+            prevMachines.map((machine) =>
+                machine.machineID === id
+                    ? { ...machine, locationX: x, locationY: y }
+                    : machine
+            )
+        );
+
+        // Send updated position to backend
+        try {
+            await axios.put(`/api/machine/updatePosition/${id}`, { locationX: x, locationY: y });
+        } catch (error) {
+            console.error('Error updating machine position:', error);
+        }
+    };
+
     const handleRoomChange = (e) => {
         setSelectedRoom(e.target.value);
     };
 
-    // Handle new room creation
     const handleCreateRoom = async (e) => {
         e.preventDefault();
-
         try {
             const response = await axios.post('/api/room/addRoom', { roomName: newRoomName });
-            setRooms((prevRooms) => [...prevRooms, response.data]); // Add new room to the room list
-            setNewRoomName(''); // Clear the input after creation
+            setRooms((prevRooms) => [...prevRooms, response.data]);
+            setNewRoomName('');
         } catch (error) {
             console.error('Error creating room:', error);
         }
     };
 
-    //machine creation
     const handleCreateMachine = async (e) => {
         e.preventDefault();
         try {
             const response = await axios.post('/api/machine/create', {
                 ...newMachine,
-                room: selectedRoom, // Ensure the room is set to the selected room
+                room: selectedRoom,
             });
             setMachines((prevMachines) => [...prevMachines, response.data]);
-            setNewMachine({ type: 'washer', locationX: 0, locationY: 0, room: selectedRoom }); // Reset the form
+            setNewMachine({ type: 'washer', locationX: 0, locationY: 0, room: selectedRoom });
         } catch (error) {
             console.error('Error creating machine:', error);
         }
     };
-    
-    // Handle machine deletion with confirmation
+
     const handleDeleteMachine = async (machineID) => {
         const confirmDelete = window.confirm('Are you sure you want to delete this machine?');
         if (!confirmDelete) return;
-
         try {
             await axios.delete(`/api/machine/delete/${machineID}`);
-            setMachines((prevMachines) => prevMachines.filter(machine => machine.machineID !== machineID));
+            setMachines((prevMachines) => prevMachines.filter((machine) => machine.machineID !== machineID));
         } catch (error) {
             console.error('Error deleting machine:', error);
         }
     };
 
-    // Track mouse position over the layout
     const handleMouseMove = (e) => {
         const layout = e.target.getBoundingClientRect();
         setMousePosition({
@@ -174,9 +182,9 @@ const AdminView = () => {
                 {selectedRoom && (
                     <>
                         <p>Managing machines in: {selectedRoom}</p>
-                        <LaundryRoom machines={machines} moveMachine={() => {}} onMouseMove={handleMouseMove} />
+                        <LaundryRoom machines={machines} updateMachinePosition={updateMachinePosition} onMouseMove={handleMouseMove} />
                         <ul>
-                            {machines.map(machine => (
+                            {machines.map((machine) => (
                                 <li key={machine.machineID}>
                                     {machine.type} - {machine.machineID}
                                     <button onClick={() => handleDeleteMachine(machine.machineID)}>Delete</button>
