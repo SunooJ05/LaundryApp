@@ -23,28 +23,38 @@
     color: transparent;
     padding-left: 3%;
     background-size:200%;
-
     animation: gradient 20s ease infinite;
 }
 #top {
     display: flex;
     align-items: center;
     justify-items: right;
-    width:100vw;
-    height:inherit;
-
+    width: 100vw;
+    height: inherit;
+}
+.overlay {
+    position: fixed; 
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgb(28, 28, 28); 
+    z-index: 998; 
+    opacity: 0.65;
 }
 .links {
     display:flex;
     flex-direction: column;
-    gap: 0.25em;
+    opacity: 100%;
+    gap: 0.4em;
     width: fit-content;
     margin-left: auto;
     margin-top: 1%;
     margin-right: var(--dropdownMarginR);
+    position: relative;
+    z-index: 999;
 }
 .links a {
-    color: inherit;
     margin-left: auto;
     text-decoration: none;
     border-radius: 8px;
@@ -52,18 +62,20 @@
     font-size: 100%;
     font-weight: bold;
     order:id;
-}
-.links a:hover {
-    background-color: #4B5FC3;
+    background-color: #6960b1;
     color: #FFF1DE;
 }
 
+.links a:hover {
+    background-color: #5d52a8fe;
+}
 .show {
     visibility: hidden;
 }
 .show a {
     opacity: 0;
     animation: fadeInDisplay 2s forwards;
+    
 }
 .show a:nth-child(1) {
     animation-delay: 0;
@@ -78,8 +90,11 @@
     animation-delay: 0.3s;
 }
 
+.hidden {
+    display: none;
+}
 .hide {
-    visibility: visible;
+    visibility: show;
 }
 .hide a {
     animation: fadeOutDisplay 1s forwards;
@@ -98,7 +113,6 @@
 }
 
 #dropdown {
-    
     width: 5em;
     display: block;
     height: 5em;
@@ -106,17 +120,17 @@
     margin-right: var(--dropdownMarginR);
     background: none;
     border: none;
+    z-index: 999;
 }
 #dropdown div {
     height: 10%;
-    background-color: #E5E5E5;
+    background-color: #f7e8ff;
     margin: 15% 0;
-    border-radius: 25px;
     width: 100%;
     transition: 500ms ease;
 }
 #dropdown:hover div{
-    background-color: #FFF1DE;
+    background-color: #e3c1ff;
     margin: 17.5% 0;
     height: 12.5%;
     transition: box-shadow 10ms ease, background-color 500ms ease, margin 500ms ease, height 500ms ease;
@@ -132,7 +146,7 @@
         align-items: center;
     }
     .links {
-
+        
     }
 }
 

@@ -4,8 +4,10 @@ import styles from '../styles/nav.module.css';
 
 const Navbar = () => {
   const [menuVisible, setMenuVisible] = useState(false);
+  const [hasOpened, setHasOpened] = useState(false);
   const toggleMenu = () => {
-    setMenuVisible(prevState => !prevState)
+    setMenuVisible(prevState => !prevState);
+    setHasOpened(true);
   };
   
 
@@ -21,7 +23,8 @@ const Navbar = () => {
           <div></div>
         </button>
       </div>
-      <div className={`${styles.links} ${menuVisible ? styles.show : styles.hide}`}>
+      {menuVisible && <div className={styles.overlay} onClick={toggleMenu} />}
+      <div className={`${styles.links} ${menuVisible ? styles.show : (hasOpened ? styles.hide : styles.hidden)}`}>
         <a href="accountsetup">Account Setup</a>
         {isAdmin && <a href="/adminview">Admin View</a>}
         <a href="/userview">User View</a>
